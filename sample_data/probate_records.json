@@ -1,0 +1,25 @@
+{
+  "records": [
+    {
+      "id": "PR-2001",
+      "name": "Harold Winters",
+      "record_type": "probate_notice",
+      "case_number": "2020-PR-000871",
+      "filing_date": "2020",
+      "jurisdiction": "Demo County, DX",
+      "address": "58 Cedar Court, Baytown, DX 55402",
+      "description": "Estate notice with incomplete (year-only) date (DEMONSTRATION DATA).",
+      "url": "https://example.gov/demo/PR-2001"
+    },
+    {
+      "id": "PR-2002",
+      "name": "Margaret Chen",
+      "record_type": "property_record",
+      "filing_date": "2021-06-09",
+      "jurisdiction": "Demo County, DX",
+      "address": "905 Harbor View Dr, Baytown, DX 55402",
+      "description": "Residential deed transfer (DEMONSTRATION DATA).",
+      "url": "https://example.gov/demo/PR-2002"
+    }
+  ]
+}

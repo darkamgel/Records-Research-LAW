@@ -1,0 +1,7 @@
+name,record_type,case_number,filing_date,jurisdiction,address,title,description,url
+Priya Nair,court_filing,2024-CV-009142,2024-05-11,Demo County DX,88 Willow Way Springfield DX 55011,Civil Case - Priya Nair,Breach of lease complaint filed by Priya Nair.,https://example.gov/demo/records/EXTRA-001
+Marcus Bell,probate_notice,2023-PR-004410,2023-08-19,Demo County DX,140 Grove Street Rivertown DX 55220,Probate Notice - Marcus Bell,Notice to creditors for the estate of Marcus Bell.,https://example.gov/demo/records/EXTRA-002
+Priya Nair,property_record,,2022-03-02,Demo County DX,88 Willow Way Springfield DX 55011,Deed Transfer - Priya Nair,Residential deed transfer recorded for Priya Nair.,https://example.gov/demo/records/EXTRA-003
+Elena Fischer,public_notice,,2024-06-30,Metro City ZZ,2210 Sunset Blvd Metro City ZZ 90120,Public Hearing Notice - Elena Fischer,Notice of public hearing referencing Elena Fischer.,https://example.gov/demo/records/EXTRA-004
+Northwind Logistics LLC,organization_filing,BR-2024-77220,2024-01-22,Demo County DX,88 Willow Way Springfield DX 55011,Business Registration - Northwind Logistics LLC,Business registration for Northwind Logistics L.L.C.,https://example.gov/demo/records/EXTRA-005
+Marcus Bell,court_filing,2024-SC-330015,2024-04-05,Demo County DX,140 Grove St Rivertown DX 55220,Small Claims - Marcus Bell,Small claims matter involving Marcus Bell.,https://example.gov/demo/records/EXTRA-006

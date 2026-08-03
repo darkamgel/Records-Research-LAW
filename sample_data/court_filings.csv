@@ -1,0 +1,6 @@
+id,name,record_type,case_number,filing_date,jurisdiction,address,description,url
+CF-1001,Jonathan A. Rivera,court_filing,2023-CV-004821,2023-03-14,"Demo County, DX","482 Maple Street, Springfield, DX 55011",Breach of contract complaint (DEMONSTRATION DATA),https://example.gov/demo/CF-1001
+CF-1002,"Rivera, Jon A.",court_filing,2023-CV-004821,2023-04-02,"Demo County, DX","482 Maple St, Springfield, DX 55011",Answer to complaint (DEMONSTRATION DATA),https://example.gov/demo/CF-1002
+CF-1003,Margaret Chen,probate_notice,2022-PR-000199,2022-11-20,"Demo County, DX","17 Birchwood Lane, Rivertown, DX 55220",Notice to creditors (DEMONSTRATION DATA),https://example.gov/demo/CF-1003
+CF-1004,David Thompson,court_filing,2024-TR-118822,2024-01-15,"Demo County, DX","12 Oak Avenue, Springfield, DX 55011",Traffic citation (DEMONSTRATION DATA),https://example.gov/demo/CF-1004
+CF-1005,David Thomson,court_filing,2024-SC-552199,2024-02-28,"Metro City, ZZ","3391 Sunset Blvd, Metro City, ZZ 90120",Small claims - different person (DEMONSTRATION DATA),https://example.gov/demo/CF-1005

@@ -1,0 +1,136 @@
+"""Synthetic, clearly-fictional demonstration records.
+
+Scenarios embedded here (see docs/entity-resolution.md):
+- DEMO-001 / DEMO-002: strong match candidate (same person, same case).
+- DEMO-003 / DEMO-004: possible-but-uncertain match (same name, diff address).
+- DEMO-005 / DEMO-006: similar names, clearly DIFFERENT fictional people.
+- DEMO-007 / DEMO-008: conflicting addresses for the same name.
+- DEMO-009: incomplete (year-only) date.
+- DEMO-010: organization filing.
+All records are fictional. Any resemblance to real persons is coincidental.
+"""
+
+from __future__ import annotations
+
+SAMPLE_RECORDS: list[dict] = [
+    {
+        "id": "DEMO-001",
+        "record_type": "court_filing",
+        "title": "Civil Case - Jonathan A. Rivera",
+        "name": "Jonathan A. Rivera",
+        "case_number": "2023-CV-004821",
+        "filing_date": "2023-03-14",
+        "jurisdiction": "Demo County, DX",
+        "address": "482 Maple Street, Springfield, DX 55011",
+        "description": "Breach of contract complaint filed by Jonathan A. Rivera.",
+        "url": "https://example.gov/demo/records/DEMO-001",
+    },
+    {
+        "id": "DEMO-002",
+        "record_type": "court_filing",
+        "title": "Case Update - Jon Rivera",
+        "name": "Rivera, Jon A.",
+        "case_number": "2023-CV-004821",
+        "filing_date": "2023-04-02",
+        "jurisdiction": "Demo County, DX",
+        "address": "482 Maple St, Springfield, DX 55011",
+        "description": "Answer to complaint in case 2023-CV-004821.",
+        "url": "https://example.gov/demo/records/DEMO-002",
+    },
+    {
+        "id": "DEMO-003",
+        "record_type": "probate_notice",
+        "title": "Probate Notice - Margaret Chen",
+        "name": "Margaret Chen",
+        "case_number": "2022-PR-000199",
+        "filing_date": "2022-11-20",
+        "jurisdiction": "Demo County, DX",
+        "address": "17 Birchwood Lane, Rivertown, DX 55220",
+        "description": "Notice to creditors for the estate of Margaret Chen.",
+        "url": "https://example.gov/demo/records/DEMO-003",
+    },
+    {
+        "id": "DEMO-004",
+        "record_type": "property_record",
+        "title": "Deed Transfer - Margaret Chen",
+        "name": "Margaret Chen",
+        "case_number": None,
+        "filing_date": "2021-06-09",
+        "jurisdiction": "Demo County, DX",
+        "address": "905 Harbor View Dr, Baytown, DX 55402",
+        "description": "Residential deed transfer recorded for Margaret Chen.",
+        "url": "https://example.gov/demo/records/DEMO-004",
+    },
+    {
+        "id": "DEMO-005",
+        "record_type": "court_filing",
+        "title": "Traffic Citation - David Thompson",
+        "name": "David Thompson",
+        "case_number": "2024-TR-118822",
+        "filing_date": "2024-01-15",
+        "jurisdiction": "Demo County, DX",
+        "address": "12 Oak Avenue, Springfield, DX 55011",
+        "description": "Traffic citation issued to David Thompson.",
+        "url": "https://example.gov/demo/records/DEMO-005",
+    },
+    {
+        "id": "DEMO-006",
+        "record_type": "court_filing",
+        "title": "Small Claims - David Thomson",
+        "name": "David Thomson",
+        "case_number": "2024-SC-552199",
+        "filing_date": "2024-02-28",
+        "jurisdiction": "Metro City, ZZ",
+        "address": "3391 Sunset Blvd, Metro City, ZZ 90120",
+        "description": "Small claims matter involving David Thomson (different person).",
+        "url": "https://example.gov/demo/records/DEMO-006",
+    },
+    {
+        "id": "DEMO-007",
+        "record_type": "public_notice",
+        "title": "Public Hearing Notice - Alicia Gomez",
+        "name": "Alicia Gomez",
+        "case_number": None,
+        "filing_date": "2023-09-01",
+        "jurisdiction": "Demo County, DX",
+        "address": "220 Elm Street, Springfield, DX 55011",
+        "description": "Notice of public hearing referencing Alicia Gomez.",
+        "url": "https://example.gov/demo/records/DEMO-007",
+    },
+    {
+        "id": "DEMO-008",
+        "record_type": "property_record",
+        "title": "Lien Filing - Alicia Gomez",
+        "name": "Alicia Gomez",
+        "case_number": None,
+        "filing_date": "2023-10-05",
+        "jurisdiction": "Demo County, DX",
+        "address": "77 Lakeshore Road, Rivertown, DX 55221",
+        "description": "Mechanics lien filing naming Alicia Gomez (conflicting address).",
+        "url": "https://example.gov/demo/records/DEMO-008",
+    },
+    {
+        "id": "DEMO-009",
+        "record_type": "probate_notice",
+        "title": "Estate Notice - Harold Winters",
+        "name": "Harold Winters",
+        "case_number": "2020-PR-000871",
+        "filing_date": "2020",
+        "jurisdiction": "Demo County, DX",
+        "address": "58 Cedar Court, Baytown, DX 55402",
+        "description": "Estate notice with incomplete (year-only) filing date.",
+        "url": "https://example.gov/demo/records/DEMO-009",
+    },
+    {
+        "id": "DEMO-010",
+        "record_type": "organization_filing",
+        "title": "Business Registration - Rivera Holdings LLC",
+        "name": "Rivera Holdings LLC",
+        "case_number": "BR-2023-33110",
+        "filing_date": "2023-02-01",
+        "jurisdiction": "Demo County, DX",
+        "address": "482 Maple Street, Springfield, DX 55011",
+        "description": "Business registration for Rivera Holdings, L.L.C.",
+        "url": "https://example.gov/demo/records/DEMO-010",
+    },
+]

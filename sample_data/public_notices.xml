@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Demo County Public Notices (SYNTHETIC DEMONSTRATION FEED)</title>
+    <link>https://example.gov/demo/notices</link>
+    <description>Fictional public-notice feed for demonstration purposes only.</description>
+    <item>
+      <title>Public Hearing Notice - Alicia Gomez</title>
+      <link>https://example.gov/demo/notices/PN-3001</link>
+      <guid>PN-3001</guid>
+      <pubDate>Fri, 01 Sep 2023 12:00:00 GMT</pubDate>
+      <description>Notice of public hearing referencing Alicia Gomez, 220 Elm Street, Springfield, DX 55011 (DEMONSTRATION DATA).</description>
+    </item>
+    <item>
+      <title>Mechanics Lien Filing - Alicia Gomez</title>
+      <link>https://example.gov/demo/notices/PN-3002</link>
+      <guid>PN-3002</guid>
+      <pubDate>Thu, 05 Oct 2023 12:00:00 GMT</pubDate>
+      <description>Mechanics lien filing naming Alicia Gomez, 77 Lakeshore Road, Rivertown, DX 55221 (conflicting address, DEMONSTRATION DATA).</description>
+    </item>
+  </channel>
+</rss>
