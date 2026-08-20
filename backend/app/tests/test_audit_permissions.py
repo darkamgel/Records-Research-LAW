@@ -35,7 +35,7 @@ def test_compliance_notice_available(client):
 def test_adapters_declare_compliance_metadata(client, auth):
     adapters = client.get("/sources/adapters", headers=auth).json()
     keys = {a["source_key"] for a in adapters}
-    assert {"csv_upload", "pdf_upload", "json_api", "rss", "demo"} <= keys
+    assert {"csv_upload", "pdf_upload", "json_api", "rss", "demo", "federal_register"} <= keys
     for a in adapters:
         assert a["access_method"]
         assert a["terms_notes"]

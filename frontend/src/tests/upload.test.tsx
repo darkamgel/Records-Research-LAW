@@ -83,4 +83,21 @@ describe("import / file upload page", () => {
       expect(screen.getByText(/Imported 8 demonstration records/)).toBeInTheDocument()
     );
   });
+
+  it("triggers a Federal Register live import", async () => {
+    apiFetchMock.mockImplementation((path: string, opts?: { method?: string; body?: unknown }) => {
+      if (path === "/sources/adapters") return Promise.resolve([]);
+      if (path === "/sources" && opts?.method === "POST") return Promise.resolve({ id: "fr-1" });
+      if (path === "/sources/fr-1/import")
+        return Promise.resolve({ records_created: 12, stats: { records_skipped: 2 } });
+      return Promise.resolve({});
+    });
+
+    wrap(<ImportPage />);
+    fireEvent.click(screen.getByRole("button", { name: /import from federal register/i }));
+    await waitFor(() =>
+      expect(screen.getByText(/Imported 12 Federal Register record/)).toBeInTheDocument()
+    );
+    expect(screen.getByText(/2 duplicate\(s\) skipped/)).toBeInTheDocument();
+  });
 });

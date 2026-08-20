@@ -12,6 +12,7 @@ import asyncio
 import json
 import uuid
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.ai.client import get_ai_client
@@ -19,7 +20,7 @@ from app.core.logging import get_logger
 from app.document_processing.chunking import chunk_pages
 from app.document_processing.pdf import extract_pdf, extract_plain_text
 from app.models.enums import JobStatus, ProcessingStatus
-from app.models.record import Document, DocumentChunk, DocumentPage
+from app.models.record import Document, DocumentChunk, DocumentPage, Record
 from app.models.source import IngestionJob, Source, UploadedFile
 from app.services import storage
 from app.services.audit import log_audit
@@ -248,6 +249,22 @@ def _apply_provenance(normalized: NormalizedRecord, uf: UploadedFile) -> Normali
     return normalized
 
 
+def _record_already_exists(
+    db: Session, *, workspace_id: uuid.UUID, external_record_id: str | None
+) -> bool:
+    if not external_record_id:
+        return False
+    existing = db.execute(
+        select(Record.id)
+        .where(
+            Record.workspace_id == workspace_id,
+            Record.external_record_id == external_record_id,
+        )
+        .limit(1)
+    ).scalar_one_or_none()
+    return existing is not None
+
+
 def run_source_import(
     db: Session,
     *,
@@ -271,10 +288,17 @@ def run_source_import(
         if not validation.valid:
             raise ValueError("; ".join(validation.messages))
         raws = _run(adapter.fetch_records(SourceQuery(config=merged, limit=limit)))
-        created = failed = 0
+        created = failed = skipped = 0
         for raw in raws:
             try:
                 normalized = _run(adapter.normalize_record(raw))
+                if _record_already_exists(
+                    db,
+                    workspace_id=source.workspace_id,
+                    external_record_id=normalized.external_record_id,
+                ):
+                    skipped += 1
+                    continue
                 create_record_from_normalized(
                     db,
                     workspace_id=source.workspace_id,
@@ -287,6 +311,7 @@ def run_source_import(
                 failed += 1
         job.records_created = created
         job.records_failed = failed
+        job.stats = {"records_skipped": skipped}
         job.progress = 100
         job.status = JobStatus.completed if failed == 0 else JobStatus.partial
         log_audit(
@@ -296,7 +321,12 @@ def run_source_import(
             action="import_records",
             target_type="source",
             target_id=str(source.id),
-            detail={"created": created, "failed": failed, "source_key": source.source_key},
+            detail={
+                "created": created,
+                "failed": failed,
+                "skipped": skipped,
+                "source_key": source.source_key,
+            },
         )
     except Exception as exc:  # noqa: BLE001
         logger.exception("Source import failed for %s", source.id)

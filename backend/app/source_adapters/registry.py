@@ -7,6 +7,7 @@ from typing import Any
 from app.source_adapters.base import SourceDescriptor
 from app.source_adapters.csv_adapter import CSVUploadAdapter
 from app.source_adapters.demo_adapter import DemoDataAdapter
+from app.source_adapters.federal_register_adapter import FederalRegisterAdapter
 from app.source_adapters.json_api_adapter import GenericJSONAPIAdapter
 from app.source_adapters.pdf_adapter import PDFUploadAdapter
 from app.source_adapters.rss_adapter import GenericRSSAdapter
@@ -14,6 +15,7 @@ from app.source_adapters.rss_adapter import GenericRSSAdapter
 ADAPTER_CLASSES = {
     CSVUploadAdapter.descriptor.source_key: CSVUploadAdapter,
     PDFUploadAdapter.descriptor.source_key: PDFUploadAdapter,
+    FederalRegisterAdapter.descriptor.source_key: FederalRegisterAdapter,
     GenericJSONAPIAdapter.descriptor.source_key: GenericJSONAPIAdapter,
     GenericRSSAdapter.descriptor.source_key: GenericRSSAdapter,
     DemoDataAdapter.descriptor.source_key: DemoDataAdapter,
