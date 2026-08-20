@@ -23,7 +23,8 @@ person or organization is slow, manual, and error-prone.
 This application automates that mechanical work while keeping a human in charge of every judgment. In
 practice, it lets a researcher:
 
-1. **Import** records from approved public sources or by uploading **PDF / CSV / TXT / JSON** files.
+1. **Import** records from approved public sources — including **live U.S. Federal Register notices**
+   via the official free API (no key required) — or by uploading **PDF / CSV / TXT / JSON** files.
 2. **Extract & normalize** the text and metadata — names, organizations, dates, addresses,
    cities/counties/states/ZIPs, case & parcel numbers — with OCR as a fallback for scanned PDFs.
 3. **Search & filter** everything with keyword, full-text, semantic, exact/fuzzy name, address, and
@@ -60,6 +61,7 @@ even with **no OpenAI key** (in a deterministic mode). See the
 - [Database migrations](#database-migrations)
 - [Running tests](#running-tests)
 - [Demo login / setup](#demo-login--setup)
+- [Live public data import](#live-public-data-import)
 - [OpenAI configuration](#openai-configuration)
 - [OCR configuration](#ocr-configuration)
 - [Adding a new source adapter](#adding-a-new-source-adapter)
@@ -85,9 +87,13 @@ firmly in the loop for every consequential judgment.
 
 - **Authentication & workspaces** — email/password auth, JWT sessions, `admin` / `researcher` /
   `reviewer` roles, and hard workspace isolation on every query.
-- **Modular source adapters** — CSV upload, PDF upload, generic public JSON API, generic RSS/Atom
-  public-notice feed, and a synthetic demonstration adapter. Each adapter declares its access
-  method, terms, rate limit, auth requirements, and attribution.
+- **Modular source adapters** — CSV upload, PDF upload, **Federal Register (official live API)**,
+  generic public JSON API, generic RSS/Atom public-notice feed, and a synthetic demonstration
+  adapter. Each adapter declares its access method, terms, rate limit, auth requirements, and
+  attribution.
+- **Live Federal Register import** — one-click pull of recent notices from
+  `federalregister.gov/api/v1` (free, no API key). Duplicate document numbers are skipped on
+  re-import. Available in **Import Data → Federal Register (live)**.
 - **File upload & ingestion** — PDF/CSV/TXT/JSON with type & size validation, SHA-256 duplicate
   detection, secure generated filenames, background processing, and per-job status/retry.
 - **Document processing** — embedded-text extraction with an **OCR fallback** (Tesseract) only when
@@ -105,6 +111,8 @@ firmly in the loop for every consequential judgment.
   duplicate / not-reviewed. Records are **never merged automatically**.
 - **AI workflows (LangGraph)** — document processing, match-evidence explanation, and cited research
   summaries. Runs in a **deterministic mode** when no OpenAI key is present.
+- **UI-configurable LLM** — set an OpenAI-compatible API key, base URL, and models per workspace from
+  **Settings** (encrypted at rest). Includes a built-in **AI Chat** page to test the connection.
 - **Research projects & reports** — group records, generate cited summaries, export as Markdown /
   JSON / CSV / printable HTML.
 - **Saved searches & history** — save, re-run, and see what changed since the last run.
@@ -256,7 +264,7 @@ cd backend && pytest -q
 cd frontend && npm test
 ```
 
-Latest local results: **backend 36 passing**, **frontend 15 passing**.
+Latest local results: **backend 41 passing**, **frontend 17 passing**.
 
 ## Demo login / setup
 
@@ -271,18 +279,97 @@ The seed creates a workspace and a set of clearly-labeled **synthetic** demonstr
 including strong-match pairs, uncertain pairs, similar-but-different people, conflicting addresses,
 and incomplete dates. You can also load demo data from the UI: **Import Data → Import demo records**.
 
+Bundled **real public-data snapshots** (for offline testing and CSV upload demos) live under
+`sample_data/real_public/`:
+
+| File | Source |
+| ---- | ------ |
+| `federal_register_notices.csv` | [Federal Register API](https://www.federalregister.gov/developers/documentation/api/v1) |
+| `nyc_hispanic_owned_businesses.csv` | [NYC Open Data](https://data.cityofnewyork.us/) |
+
+Upload these via **Import Data → Upload a file**, or pull live Federal Register notices as described
+below.
+
+## Live public data import
+
+### Federal Register (official API — no key required)
+
+The app includes a dedicated **`federal_register`** adapter that calls the public Federal Register
+JSON API. No signup, no API key, no token.
+
+**From the UI (recommended):**
+
+1. Log in and open **Import Data**.
+2. Under **Federal Register (live)**, choose a document type (e.g. *Notices*) and how many records
+   (1–100).
+3. Click **Import from Federal Register**.
+
+Records appear under **Records** and **Search** with title, agency, document number, publication
+date, abstract, and a link to the official document. Re-importing the same document numbers is
+safe — duplicates are skipped automatically.
+
+**Via the API** (same flow the UI uses):
+
+```bash
+# Create a source (once per workspace)
+POST /sources
+{
+  "source_key": "federal_register",
+  "source_name": "Federal Register (Official API)",
+  "source_type": "json_api",
+  "access_method": "official_api",
+  "jurisdiction": "United States",
+  "config": { "document_type": "NOTICE", "order": "newest" }
+}
+
+# Pull records
+POST /sources/{source_id}/import
+{ "limit": 50 }
+```
+
+Direct API example (no app required):
+
+```bash
+curl "https://www.federalregister.gov/api/v1/documents.json?per_page=5&order=newest"
+```
+
+Implementation: `backend/app/source_adapters/federal_register_adapter.py`.
+
+### Other compliant sources
+
+| Method | Adapter | Notes |
+| ------ | ------- | ----- |
+| CSV / PDF / TXT / JSON upload | `csv_upload`, `pdf_upload` | User-provided files; SHA-256 duplicate detection on uploads. |
+| Generic JSON API | `json_api` | Point at any public JSON endpoint + field mapping (via API). |
+| RSS / Atom feed | `rss` | GovInfo and other public notice feeds (via API). |
+| Demo / synthetic | `demo` | Clearly labeled test data. |
+
+Do **not** scrape `federalregister.gov` HTML — use the official API or GovInfo RSS feeds instead.
+See [`docs/source-adapters.md`](docs/source-adapters.md).
+
 ## OpenAI configuration
 
-Set `OPENAI_API_KEY` (and optionally `OPENAI_MODEL` / `OPENAI_EMBEDDING_MODEL`). When a key is
-present, the app uses real embeddings and LLM-assisted match explanations and research summaries —
-all outputs are schema-validated with Pydantic before use, and prompt-injection defenses separate
-system instructions from untrusted document content.
+You can configure the LLM in **two ways** (workspace UI takes precedence over environment variables
+when enabled):
 
-To use an **OpenAI-compatible** server (self-hosted vLLM, a gateway, or a custom-OpenAI endpoint)
-instead of the official API, also set `OPENAI_BASE_URL` to that server's base URL — the value before
-`/chat/completions` in the provider's example, usually ending in `/v1` — and set `OPENAI_MODEL` to a
-model the endpoint actually serves. If the endpoint has no embeddings model, semantic search
-automatically falls back to the local deterministic embedding.
+1. **Settings UI (recommended)** — after login, open **Settings → AI / LLM configuration**. Paste an
+   API key, optional base URL (for OpenAI-compatible providers), chat model, and embedding model.
+   Keys are encrypted at rest with `APP_SECRET_KEY` and never returned in full after save. Use
+   **Test connection** or **AI Chat** to verify.
+2. **Environment variables** — set `OPENAI_API_KEY` (and optionally `OPENAI_MODEL` /
+   `OPENAI_EMBEDDING_MODEL` / `OPENAI_BASE_URL`) in `.env` or `backend/.env` as a server default.
+
+When a key is present, the app uses real embeddings and LLM-assisted match explanations and research
+summaries — all outputs are schema-validated with Pydantic before use, and prompt-injection defenses
+separate system instructions from untrusted document content.
+
+To use an **OpenAI-compatible** server (self-hosted vLLM, ConfidentialMind, a gateway, etc.) instead
+of the official OpenAI API, set **Base URL** in Settings (or `OPENAI_BASE_URL` in `.env`) to the
+provider's API root — usually ending in `/v1` — and set the chat model to one the endpoint serves.
+If the endpoint has no embeddings model, semantic search automatically falls back to the local
+deterministic embedding.
+
+**Never commit real API keys.** `.env` files are gitignored.
 
 When **no** key is present, the app runs in deterministic mode:
 
@@ -317,7 +404,8 @@ add scrapers for sources that prohibit automated access. Full walkthrough:
 Interactive OpenAPI docs are served at `/docs`. Route groups:
 
 `/auth`, `/sources`, `/files`, `/documents`, `/records`, `/matches`, `/projects`,
-`/saved-searches`, `/dashboard`, `/audit`, plus `/health` and `/compliance`. Full reference:
+`/saved-searches`, `/dashboard`, `/audit`, `/settings/ai` (get/put/test/chat), plus `/health` and
+`/compliance`. Full reference:
 [`docs/api.md`](docs/api.md).
 
 ## Known MVP limitations
@@ -328,10 +416,13 @@ Interactive OpenAPI docs are served at `/docs`. Route groups:
   deterministic in-Python similarity.
 - spaCy NER and LLM extraction are optional; the default deterministic extractor is intentionally
   conservative.
-- Saved searches are on-demand (no scheduled monitoring/alerts).
+- Saved searches and Federal Register imports are on-demand (no scheduled polling/alerts yet).
 - Rate limiting is a simple in-process limiter suitable for a single instance.
 - PDF export of reports is not included (Markdown/JSON/CSV/HTML are).
-- Only the five MVP adapters ship; real government adapters must be added per their terms.
+- Six bundled adapters ship (including live Federal Register); additional government sources can be
+  added via the generic JSON API / RSS adapters or new dedicated adapters per source terms.
+- The Import UI exposes demo upload, Federal Register live import, and file upload; RSS and generic
+  JSON API sources are configured via the REST API today.
 
 See [`docs/deployment.md`](docs/deployment.md) for recommended production hardening.
 
